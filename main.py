@@ -20,13 +20,13 @@ async def tracker(request: Request, call_next):
     channel.queue_declare(queue='logs')
 
     tracker = visitor_tracker(request)
-    print(tracker)
+    
     
     log = new_log(tracker["ip_address"], tracker["request_url"], tracker["request_port"],
                       tracker["request_path"], tracker["request_method"],
                       tracker["browser_type"], tracker["operating_system"],tracker["request_time"])
     
-    channel.basic_publish(exchange='', routing_key='hello', body=log)
+    channel.basic_publish(exchange='', routing_key='logs', body=log)
     print(" [x] Sent 'Logs'")
     connection.close()
     
