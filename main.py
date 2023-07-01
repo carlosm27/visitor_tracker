@@ -3,7 +3,7 @@ from datetime import datetime
 from tracker import visitor_tracker
 from controllers import new_log, all_logs
 
-import pika
+from send import sender
 
 
 
@@ -13,11 +13,7 @@ app = FastAPI()
 
 @app.middleware("tracker")
 async def tracker(request: Request, call_next):
-    connection = pika.BlockingConnection(pika.ConnectionParameters('localhost'))
-    channel = connection.channel()
-
-
-    channel.queue_declare(queue='logs')
+   
 
     tracker = visitor_tracker(request)
     
@@ -26,9 +22,7 @@ async def tracker(request: Request, call_next):
                       tracker["request_path"], tracker["request_method"],
                       tracker["browser_type"], tracker["operating_system"],tracker["request_time"])
     
-    channel.basic_publish(exchange='', routing_key='logs', body=log)
-    print(" [x] Sent 'Logs'")
-    connection.close()
+    sender(log)
     
         
     
